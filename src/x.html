@@ -1,0 +1,56 @@
+<html>
+<body>
+
+<div id="div"></div>
+<script type="text/javascript">
+
+var div = document.getElementById("div");
+var socketOpen = false;
+
+if ("WebSocket" in window) {
+    div.innerHTML += "connecting ... ";     
+    var ws = new WebSocket("ws://localhost:7000/");    	  
+	  ws.onopen = function() {
+	    // Web Socket is connected. You can send data by send() method.
+	    // ws.send("message to send");
+	    socketOpen = true;
+        div.innerHTML += "connected <br/>";         	    
+	  };
+	  ws.onmessage = function (evt) { 
+		  var received_msg = evt.data; 
+		  div.innerHTML += evt.data + "<br/>";		   
+	  };
+	  ws.onclose = function() { 
+		  // websocket is closed. 	
+          div.innerHTML += "closed <br/>";         
+		  
+	  };
+	  
+	  ws.onerror = function() {
+		  div.innerHTML += "error <br/>"; 		 
+	  };
+} else {
+	div.innerHTML += "ws not supported <br/>";         
+}
+
+
+function mySubmit() {
+	if (!socketOpen) {return;}
+	
+    var inp = document.getElementById("inp");    
+
+    ws.send(inp.value)
+    div.innerHTML += inp.value + "<br/>";         
+	
+	inp.value = "";
+	
+	return false;	
+}
+
+
+</script>
+<form id="xform" onsubmit="return mySubmit()">
+<input id="inp" type="text" />
+</form>
+</body>
+</html>
