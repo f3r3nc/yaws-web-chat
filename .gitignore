@@ -1,4 +1,4 @@
 .settings/
-.project/
+.project
 .DS_Store
 ebin/*
