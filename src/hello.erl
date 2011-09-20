@@ -21,16 +21,28 @@ out(A) ->
     io:format("connection: ~p~n", [A]),
     case get_upgrade_header(A#arg.headers) of 
     undefined ->
-        {content, "text/plain", "You're not a web sockets client! Go000 away!"};
+        {content, "text/plain", "You're not a web sockets client! Go00 away!"};
     "WebSocket" ->
-        WebSocketOwner = spawn(fun() -> websocket_owner() end),
-        {websocket, WebSocketOwner, passive}
+        WebSocketOwner = spawn(fun() -> active_websocket_owner() end),
+        {websocket, WebSocketOwner, active}
+    end.
+
+active_websocket_owner() ->
+    % io:format("websocket_owner: ~p~n", [self()]),
+    receive
+        {ok, WebSocket} ->
+            io:format("websocket ok"),
+            yaws_api:websocket_setopts(WebSocket, [{active, true}]),            
+            echo_server(WebSocket);    
+        _ -> io:format("websocket_owner"),         
+             ok
     end.
 
 websocket_owner() ->
-    io:format("websocket_owner: ~p~n", [self()]),
+    % io:format("websocket_owner: ~p~n", [self()]),
     receive
     {ok, WebSocket} ->
+        io:format("websocket ok"),
         %% This is how we read messages (plural!!) from websockets on passive mode
         case yaws_api:websocket_receive(WebSocket) of
         {error,closed} ->
@@ -45,13 +57,12 @@ websocket_owner() ->
                 io:format("websocket_owner got: ~p. Terminating~n", [Other])
             end
         end;
-    _ -> ok
+    _ -> io:format("websocket_owner"), 
+         ok
     end.
 
 echo_server(WebSocket) ->
     receive
-        
-    
         {tcp, WebSocket, DataFrame} ->      
             Data = yaws_api:websocket_unframe_data(DataFrame),        
             io:format("Got data from Websocket: ~p~n", [Data]),
