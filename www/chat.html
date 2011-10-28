@@ -1,0 +1,95 @@
+<html>
+<body id="body">
+
+<div id="div"></div>
+<script type="text/javascript">
+
+var div = document.getElementById("div");
+var socketOpen = false;
+var ws;
+var nick
+
+function connectToChatServer() {
+    nick = document.getElementById("nick").value;
+	var loginForm = document.getElementById("loginForm");
+    document.getElementById("body").removeChild(loginForm);
+	
+	if ("WebSocket" in window) {
+	    div.innerHTML += "connecting ... ";     
+	    
+	    // make sure yaws is listening on the URL  
+	    ws = new WebSocket("ws://localhost:7000/chat");    	  
+		
+	    ws.onopen = function() {
+		    // Web Socket is connected. You can send data by send() method.
+		    
+		    // the first message will be the nick name..
+		    ws.send(nick);
+		    socketOpen = true;
+	        div.innerHTML += "connected <br/>";  
+	        var sendForm = document.getElementById("input");
+	        input.hidden = false;
+		  };
+		  ws.onmessage = function (evt) { 
+			  var received_msg = evt.data; 
+			  div.innerHTML += evt.data + "<br/>";		   
+		  };
+		  ws.onclose = function() { 
+			  // websocket is closed. 	
+	          div.innerHTML += "closed <br/>";         
+			  
+		  };
+		  
+		  ws.onerror = function() {
+			  div.innerHTML += "error <br/>"; 		 
+		  };
+	} else {
+		div.innerHTML += "ws not supported <br/>";         
+	}
+	
+	return false;
+}
+
+function mySubmit() {
+	if (!socketOpen) {return;}
+	
+    var inp = document.getElementById("inp");    
+  
+    ws.send(inp.value)
+    // div.innerHTML += inp.value + "<br/>";         
+	
+	inp.value = "";
+	
+	return false;	
+}
+
+
+function inputPressed(e) {
+	
+	if (e.keyCode != 13 /* Return */) 
+		return;
+	    
+    var inp = document.getElementById("inp");    	
+	var msg = inp.value.replace("\n", "");
+	
+	if (msg.length)  {
+        ws.send(nick + ": " + msg);
+	}
+	
+	inp.value = "";
+}
+
+
+</script>
+
+<form action="#" id="loginForm" onsubmit="return connectToChatServer()">
+nick: <input id="nick" type="text"/>
+<input type="submit" value="login"/>
+</form>
+
+<div id="input" hidden="true">
+    <input id="inp" type="text" onkeypress="inputPressed(event)"/>
+</div> 
+
+</body>
+</html>

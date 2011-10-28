@@ -1,0 +1,19 @@
+Simple Web chat based on Yaws and Websocket.
+Most of the code was cherry-picked from Joe's book (Programming Erlang) and the yaws examples.  
+
+
+Usage:
+ 0) configuration: setup DOCROOT in ybed.erl
+ 1) start: ybed_sup:start_link().
+ 2) browser: http://localhost:7000/chat.html or file:///path_to/chat.html
+ 
+
+Note:
+The standard of WebSocket is under development thus yaws and the browser 
+must support the same WS version in order to work correctly.
+
+
+Tested with yaws 1.91.
+ + works with Safari Version 5.1.1 (6534.51.22) but 
+ - does NOT with Chrome (15.0.874.102) 
+ - probably not with Chrome (14.x).
