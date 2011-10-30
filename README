@@ -3,7 +3,7 @@ Most of the code was cherry-picked from Joe's book (Programming Erlang) and the 
 
 
 Usage:
- 0) configuration: setup DOCROOT in ybed.erl
+ 0) configure ybed.erl: DOCROOT must point to the directory where chat.html is; check the -include: the location of yaws_api.hrl might be somewhere else.
  1) start: ybed_sup:start_link().
  2) browser: http://localhost:7000/chat.html or file:///path_to/chat.html
  
